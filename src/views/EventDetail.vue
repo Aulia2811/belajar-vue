@@ -1,3 +1,8 @@
+<script setup>
+import AppButton from '@/components/ui/AppButton.vue';
+import AppCard from '@/components/ui/AppCard.vue';
+</script>
+
 <template>
   <div class="event-detail-page">
     <button @click="$router.push('/browse/events')" class="btn-back">&larr; Back to Events</button>
@@ -41,14 +46,18 @@
 
       <!-- FOCAL POINT & STICKY PANE -->
       <div class="sidebar">
-        <div class="ticket-card sticky-pane">
+        <AppCard class="ticket-card sticky-pane">
           <h3>Attendee Registration</h3>
           <p class="price">Free</p>
           <p class="ticket-desc">Secure your seat now before the quota is full.</p>
+
           <!-- STRONGEST FOCAL POINT -->
-          <button class="btn-register">Register Now</button>
+          <AppButton variant="primary" class="btn-register">
+            Register Now
+          </AppButton>
+
           <p class="spots">Only 12 seats left!</p>
-        </div>
+        </AppCard>
       </div>
 
     </div>
@@ -56,14 +65,13 @@
 </template>
 
 <style scoped>
-.btn-back { background: none; border: none; font-size: 1rem; cursor: pointer;
-  margin-bottom: var(--space-6); color: var(--text-muted); }
-.detail-header { background: var(--bg-light); border-radius: var(--space-4);
-  border: 1px solid var(--border-color); padding: var(--space-12) var(--space-8); margin-bottom: var(--space-8); }
-.event-tag { display: inline-block; background: rgba(102, 68, 255, 0.1); color: var(--primary);
-  padding: var(--space-1) var(--space-4); border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-bottom: var(--space-4); }
+.btn-back { background: none; border: none; font-size: 1rem; cursor: pointer; margin-bottom: var(--space-6); color: var(--text-muted); }
+.detail-header { background: var(--bg-light); border-radius: var(--space-4); border: 1px solid var(--border-color); padding: var(--space-12) var(--space-8);
+  margin-bottom: var(--space-8); }
+.event-tag { display: inline-block; background: rgba(102, 68, 255, 0.1); color: var(--primary); padding: var(--space-1) var(--space-4);
+  border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-bottom: var(--space-4); }
 .detail-header h1 { font-size: 2.8rem; margin-bottom: var(--space-4); line-height: 1.2; }
-.meta-info { display: flex; gap: var(--space-6); flex-wrap: wrap; }
+.meta-info { display: flex; gap: var(--space-6); }
 .meta-item { color: var(--text-muted); font-weight: 500; font-size: 1.05rem; }
 
 /* ASYMMETRICAL GRID */
@@ -74,17 +82,13 @@
 }
 
 .main-desc h2 { margin-bottom: var(--space-4); font-size: 1.8rem; border-left: 4px solid var(--primary); padding-left: var(--space-2); }
-.main-desc p { color: var(--text-main); line-height: 1.8; margin-bottom: var(--space-6); font-size: 1.05rem; }
+.main-desc p { color: var(--text-muted); line-height: 1.8; margin-bottom: var(--space-6); font-size: 1.05rem; }
 .agenda-list { list-style: none; padding: 0; margin: 0 0 var(--space-8) 0; }
 .agenda-list li { padding: var(--space-3) 0; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 1.05rem; }
 
 /* FOCAL POINT CARD */
 .ticket-card {
-  background: white;
   padding: var(--space-8);
-  border-radius: var(--space-4);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
   text-align: center;
 }
 
@@ -100,16 +104,7 @@
 
 .btn-register {
   width: 100%;
-  padding: var(--space-4);
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
 }
-.btn-register:hover { background: var(--primary-hover); }
 .spots { margin-top: var(--space-4); color: #e63946; font-weight: 600; font-size: 0.95rem; }
 
 @media (max-width: 900px) {
