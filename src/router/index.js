@@ -65,6 +65,12 @@ const routes = [
         name: 'dashboard',
         component: () => import('@/views/Dashboard.vue'),
         meta: { breadcrumb: 'Dashboard' }
+      },
+      {
+        path: 'events', // relatif, TANPA garis miring di awal
+        name: 'dashboard-events',
+        component: () => import('@/views/EventManagement.vue'),
+        meta: { breadcrumb: 'Event Management' }
       }
     ]
   }
