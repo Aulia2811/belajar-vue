@@ -38,11 +38,31 @@ const routes = [
             component: () => import('@/views/EventDetail.vue'),
             meta: { breadcrumb: 'Event Detail' }
           },
+          // PENAMBAHAN RUTE BARU DARI MODUL 5
+          {
+            path: 'events/:id/register',
+            name: 'event-registration',
+            component: () => import('@/views/EventRegistration.vue'),
+            meta: { breadcrumb: 'Register Event' }
+          },
           {
             path: 'category',
             name: 'category',
             component: () => import('@/views/Category.vue'),
             meta: { breadcrumb: 'Category' }
+          },
+          // PENAMBAHAN RUTE BARU DARI MODUL 5
+          {
+            path: 'your-events',
+            name: 'your-events',
+            component: () => import('@/views/YourEvents.vue'),
+            meta: { breadcrumb: 'Your Events' }
+          },
+          {
+            path: 'your-events/:id',
+            name: 'ticket-receipt',
+            component: () => import('@/views/TicketReceipt.vue'),
+            meta: { breadcrumb: 'Ticket Receipt' }
           }
         ]
       },
@@ -78,7 +98,15 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  // PENAMBAHAN SCROLL BEHAVIOR DARI MODUL 5
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 export default router
