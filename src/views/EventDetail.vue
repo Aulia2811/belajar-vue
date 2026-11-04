@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useEvents } from '@/composables/useEvents';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -7,7 +7,7 @@ import AppCard from '@/components/ui/AppCard.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { getEventById, isUserRegistered } = useEvents();
+const { getEventById, isUserRegistered, fetchEventById, loading, error } = useEvents();
 
 // MENGAMBIL DATA EVENT DINAMIS DARI STATE BERDASARKAN ID DI URL
 const event = computed(() => getEventById(route.params.id));
@@ -16,6 +16,13 @@ const event = computed(() => getEventById(route.params.id));
 const isRegistered = computed(() => {
   return event.value ? isUserRegistered(event.value.id) : false;
 });
+
+// PASTIKAN DATA DIAMBIL DARI REST API JIKA USER LANGSUNG MASUK KE URL DETAIL
+onMounted(async () => {
+  if (!event.value) {
+    await fetchEventById(route.params.id);
+  }
+});
 </script>
 
 <template>
@@ -23,9 +30,16 @@ const isRegistered = computed(() => {
     <button @click="router.push('/browse/events')" class="btn-back">
       &larr; Back to Events
     </button>
-    
-    <!-- KONDISI JIKA EVENT DITEMUKAN -->
-    <div v-if="event">
+
+    <!-- KONDISI 1: LOADING DETAIL ACARA DARI SERVER -->
+    <div v-if="loading" class="detail-header skeleton-shimmer" style="min-height: 180px; display: flex; align-items: center; justify-content: center;">
+      <p style="color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
+        ⏳ Memuat rincian acara dari server...
+      </p>
+    </div>
+
+    <!-- KONDISI 2: DATA EVENT DITEMUKAN -->
+    <div v-else-if="event">
       <div class="detail-header">
         <div class="header-tags">
           <span class="event-tag">{{ event.cat }}</span>
@@ -34,17 +48,19 @@ const isRegistered = computed(() => {
           <span v-else-if="event.quota <= 0" class="status-tag status-soldout">Sold Out</span>
           <span v-else class="status-tag status-live">Open Registration</span>
         </div>
-        
+
         <h1>{{ event.title }}</h1>
+
         <div class="meta-info">
           <span class="meta-item"><strong>Date:</strong> {{ event.date }}</span>
           <span class="meta-item"><strong>Location:</strong> {{ event.loc }}</span>
           <span class="meta-item"><strong>Remaining Quota:</strong> {{ event.quota }} Attendees</span>
         </div>
       </div>
-      
+
       <!-- ASYMMETRICAL LAYOUT -->
       <div class="detail-content grid-asymmetric">
+
         <!-- F-PATTERN: Breaking text with Headings & Paragraphs -->
         <div class="main-desc">
           <h2>About This Event</h2>
@@ -52,12 +68,12 @@ const isRegistered = computed(() => {
             {{ event.desc }}
           </p>
         </div>
-        
+
         <!-- FOCAL POINT & STICKY PANE -->
         <div class="sidebar">
           <AppCard class="ticket-card sticky-pane">
             <h3>Event Registration</h3>
-            
+
             <p v-if="event.done" class="ticket-desc">
               Registration is closed as this event has concluded.
             </p>
@@ -70,7 +86,7 @@ const isRegistered = computed(() => {
             <p v-else class="ticket-desc">
               Secure your spot now before the remaining quota is filled.
             </p>
-            
+
             <!-- BUTTON FOCAL POINT DENGAN HIERARKI STATUS -->
             <div class="action-buttons">
               <!-- STATUS 1: SUDAH SELESAI -->
@@ -82,7 +98,7 @@ const isRegistered = computed(() => {
               >
                 Registration Closed
               </AppButton>
-              
+
               <!-- STATUS 2: SUDAH TERDAFTAR -->
               <div v-else-if="isRegistered" class="registered-action-group">
                 <AppButton
@@ -96,7 +112,7 @@ const isRegistered = computed(() => {
                   View Your Ticket Receipt &rarr;
                 </router-link>
               </div>
-              
+
               <!-- STATUS 3: KUOTA HABIS -->
               <AppButton
                 v-else-if="event.quota <= 0"
@@ -106,7 +122,7 @@ const isRegistered = computed(() => {
               >
                 Sold Out
               </AppButton>
-              
+
               <!-- STATUS 4: TERSEDIA (NORMAL) -->
               <AppButton
                 v-else
@@ -117,19 +133,20 @@ const isRegistered = computed(() => {
                 Register Now
               </AppButton>
             </div>
-            
+
             <p v-if="!event.done && !isRegistered && event.quota > 0" class="spots">
               {{ event.quota }} seats available
             </p>
           </AppCard>
         </div>
+
       </div>
     </div>
-    
-    <!-- EMPTY STATE IF ID NOT FOUND -->
+
+    <!-- KONDISI 3: EMPTY / ERROR STATE IF ID NOT FOUND -->
     <div v-else class="not-found-card">
-      <h2>404 Event Not Found</h2>
-      <p>The event you are looking for is unavailable or has been removed by the organizer.</p>
+      <h2>404 - Event Not Found</h2>
+      <p>{{ error || 'The event you are looking for is unavailable or has been removed by the organizer.' }}</p>
       <AppButton variant="primary" @click="router.push('/browse/events')">
         Back to Event Catalog
       </AppButton>
@@ -186,14 +203,17 @@ const isRegistered = computed(() => {
   background: rgba(46, 204, 113, 0.15);
   color: #27ae60;
 }
+
 .status-registered {
   background: #dbeafe;
   color: #1d4ed8;
 }
+
 .status-soldout {
   background: #fee2e2;
   color: #b91c1c;
 }
+
 .status-ended {
   background: rgba(108, 117, 125, 0.15);
   color: #6c757d;
@@ -223,6 +243,7 @@ const isRegistered = computed(() => {
   border-left: 4px solid var(--primary);
   padding-left: var(--space-2);
 }
+
 .description-text {
   color: var(--text-muted);
   line-height: 1.8;
@@ -250,6 +271,7 @@ const isRegistered = computed(() => {
 .btn-register {
   width: 100%;
 }
+
 .btn-disabled {
   cursor: not-allowed;
   opacity: 0.65;
@@ -278,8 +300,13 @@ const isRegistered = computed(() => {
   display: inline-block;
   transition: color 0.2s;
 }
-.view-receipt-link:hover { text-decoration: underline; }
-.spots { margin-top: var(--space-4); color: #27ae60; font-weight: 600; font-size: 0.95rem; }
+
+.view-receipt-link:hover {
+  text-decoration: underline;
+}
+
+.spots { margin-top: var(--space-4); color: #27ae60;
+  font-weight: 600; font-size: 0.95rem; }
 
 .not-found-card {
   text-align: center;
