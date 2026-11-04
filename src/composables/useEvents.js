@@ -6,7 +6,7 @@ const REGISTRATIONS_STORAGE_KEY = 'gatherly_user_registrations';
 
 // REST API CONFIGURATION
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL || 'https://6ae2e75fbbb54129229a9b0a.mockapi.io/api/v1';
+  const envUrl = import.meta.env.VITE_API_URL;
   return envUrl ? envUrl.trim().replace(/\/+$/, '') : '';
 };
 
